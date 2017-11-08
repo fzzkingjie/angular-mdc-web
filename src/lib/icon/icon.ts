@@ -9,17 +9,29 @@ import {
   SimpleChanges,
 } from '@angular/core';
 
+// The values that can be used as sizes for an [MdcIcon].
+export enum IconSize {
+  DefaultSize = 24,
+  xSmall = 12,
+  small = 13,
+  medium = 16,
+  large = 18,
+  xLarge = 20,
+}
+
 @Directive({
   selector: 'mdc-icon',
 })
 export class MdcIcon implements OnChanges, OnInit {
   private _previousFontSetClass: string;
   private _previousFontIconClass: string;
+  private _previousfontSize: IconSize;
 
   @Input() fontSet: string = 'material-icons';
   @Input() fontIcon: string;
+  @Input() fontSize: IconSize = IconSize.DefaultSize;
   @HostBinding('class.material-icons') get classMaterialIcon(): string {
-    return this.fontSet == 'material-icons' ? 'material-icons' : '';
+    return this.fontSet === 'material-icons' ? 'material-icons' : '';
   }
 
   constructor(
@@ -29,19 +41,20 @@ export class MdcIcon implements OnChanges, OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    const fontSize = changes['fontSize'] ? changes['fontSize'].currentValue : this.fontSize;
     const fontSet = changes['fontSet'] ? changes['fontSet'].currentValue : this.fontSet;
     const fontIcon = changes['fontIcon'] ? changes['fontIcon'].currentValue : this.fontIcon;
-    this._updateFontIconClasses(fontSet, fontIcon);
+    this._updateFontIconClasses(fontSet, fontIcon, fontSize);
   }
 
   ngOnInit() {
-    this._updateFontIconClasses(this.fontSet, this.fontIcon);
+    this._updateFontIconClasses(this.fontSet, this.fontIcon, this.fontSize);
   }
 
-  private _updateFontIconClasses(fontSet: string | null, fontIcon: string | null): void {
+  private _updateFontIconClasses(fontSet: string | null, fontIcon: string | null, fontSize: IconSize): void {
     const elem = this.elementRef.nativeElement;
 
-    if (fontSet != this._previousFontSetClass) {
+    if (fontSet !== this._previousFontSetClass) {
       if (this._previousFontSetClass) {
         this._renderer.removeClass(elem, this._previousFontSetClass);
       }
@@ -51,7 +64,7 @@ export class MdcIcon implements OnChanges, OnInit {
       this._previousFontSetClass = fontSet;
     }
 
-    if (this.fontIcon != this._previousFontIconClass) {
+    if (this.fontIcon !== this._previousFontIconClass) {
       if (this._previousFontIconClass) {
         this._renderer.removeClass(elem, this._previousFontIconClass);
       }
@@ -61,6 +74,12 @@ export class MdcIcon implements OnChanges, OnInit {
         }
       }
       this._previousFontIconClass = this.fontIcon;
+    }
+
+    if (this.fontSize) {
+      if (this.fontSize !== this._previousfontSize) {
+        this._renderer.setStyle(this.elementRef.nativeElement, 'font-size', `${IconSize[fontSize]}px`);
+      }
     }
   }
 }

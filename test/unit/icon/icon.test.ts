@@ -66,7 +66,7 @@ describe('MdcIcon', () => {
 @Component({
   template:
   `
-    <mdc-icon>{{myIcon}}</mdc-icon>
+    <mdc-icon fontSize="small">{{myIcon}}</mdc-icon>
   `,
 })
 class SimpleTest {
